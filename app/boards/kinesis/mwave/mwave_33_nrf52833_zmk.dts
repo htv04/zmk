@@ -18,6 +18,7 @@
 
     chosen {
         zmk,physical-layout = &layout_0;
+        zmk,studio-rpc-uart = &cdc_acm_uart;
     };
 
     vbatt: vbatt {
@@ -302,3 +303,9 @@
         };
     };
  };
+
+&zephyr_udc0 {
+    cdc_acm_uart: cdc_acm_uart {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};

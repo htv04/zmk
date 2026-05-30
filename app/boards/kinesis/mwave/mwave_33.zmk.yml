@@ -1,0 +1,14 @@
+file_format: "1"
+id: mwave_33//zmk
+name: Kinesis mWave
+type: board
+url: https://kinesis-ergo.com/keyboards/mwave/
+arch: arm
+features:
+  - keys
+  - backlight
+  - pointer
+  - studio
+outputs:
+  - usb
+  - ble

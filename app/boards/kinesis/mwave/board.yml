@@ -1,0 +1,7 @@
+boards:
+  - name: mwave_33
+    vendor: kinesis
+    socs:
+      - name: nrf52833
+        variants:
+          - name: zmk

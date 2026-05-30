@@ -6,3 +6,16 @@ description: Battery SoC monitoring using voltage divider
 compatible: "zmk,battery-voltage-divider"
 
 include: voltage-divider.yaml
+
+properties:
+  chemistry:
+    type: int
+    default: 1
+    enum:
+      - 1
+      - 2
+      - 3
+    description: |
+      Battery chemistry, used to select the voltage-to-state-of-charge curve.
+      Use the BATTERY_CHEMISTRY_* macros from <dt-bindings/zmk/battery_chemistry.h>.
+      Defaults to BATTERY_CHEMISTRY_LIION (1) for backward compatibility.

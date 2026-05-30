@@ -13,6 +13,8 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
 
+#include <dt-bindings/zmk/battery_chemistry.h>
+
 #include "battery_common.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -26,6 +28,7 @@ struct bvd_config {
     struct gpio_dt_spec power;
     uint32_t output_ohm;
     uint32_t full_ohm;
+    int chemistry;
 };
 
 struct bvd_data {
@@ -74,7 +77,21 @@ static int bvd_sample_fetch(const struct device *dev, enum sensor_channel chan) 
 
         uint16_t millivolts = val * (uint64_t)drv_cfg->full_ohm / drv_cfg->output_ohm;
         LOG_DBG("ADC raw %d ~ %d mV => %d mV", drv_data->value.adc_raw, val, millivolts);
-        uint8_t percent = lithium_ion_mv_to_pct(millivolts);
+        uint8_t percent = 0;
+        switch (drv_cfg->chemistry) {
+        case BATTERY_CHEMISTRY_LIION:
+            percent = lithium_ion_mv_to_pct(millivolts);
+            break;
+        case BATTERY_CHEMISTRY_ALKALINE:
+            percent = alkaline_mv_to_pct(millivolts);
+            break;
+        case BATTERY_CHEMISTRY_CR2032:
+            percent = cr2032_mv_to_pct(millivolts);
+            break;
+        default:
+            LOG_ERR("Unsupported battery chemistry: %d", drv_cfg->chemistry);
+            break;
+        }
         LOG_DBG("Percent: %d", percent);
 
         drv_data->value.millivolts = millivolts;
@@ -169,6 +186,7 @@ static const struct bvd_config bvd_cfg = {
 #endif
     .output_ohm = DT_INST_PROP(0, output_ohms),
     .full_ohm = DT_INST_PROP(0, full_ohms),
+    .chemistry = DT_INST_PROP(0, chemistry),
 };
 
 DEVICE_DT_INST_DEFINE(0, &bvd_init, NULL, &bvd_data, &bvd_cfg, POST_KERNEL,
